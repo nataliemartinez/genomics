@@ -4,9 +4,6 @@
 import time
 from collections import defaultdict, Counter
 
-def get_suffix_array(str):
-    return sorted(range(len(str)), key=lambda i: str[i:])
-
 def sort_bucket(str, bucket, order=1):
     d = defaultdict(list) 
     for i in bucket:
@@ -26,19 +23,6 @@ def suffix_array_ManberMyers(str):
 if __name__ == "__main__":
     with open("input_files/input.txt") as f:
         m = f.read()
-    #str = m#[:100000]
     str = "aacaactcaattcaaacaag"
-    #print(len(str))
-#    str = "mississipi"
-    start_time = time.time()
-    
-    #x = get_suffix_array(str)
-    end_time = time.time()
-    print("Time for python sort was %g seconds" % (end_time - start_time))
-    start_time = time.time()
-    y = suffix_array_ManberMyers(str)
-    end_time = time.time()
-    #assert(x == y)
-    print("Time for Manber Myers was %g seconds" % (end_time - start_time))
-    print (y)
-    #print (x)
+    output = suffix_array_ManberMyers(str)
+    print (output)
