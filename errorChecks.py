@@ -47,6 +47,7 @@ def readFiles():
         listOccurrences(filename, 5, k_mer_counts)
 
     for k,v in k_mer_counts.items():
-        print(k)
+        print(k,end=' ')
+        print(v)
 
 readFiles()
