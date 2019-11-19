@@ -1,15 +1,18 @@
+from naive_suffix_array import suffix_array_ManberMyers
+
 class GkArray:
 
-    def __init__(self, reads, k, error_map, read_length, Cr, SA):
+    def __init__(self, reads, k, error_map, read_length, Cr):
         self.reads = reads
         self.k = k
         self.error_map = error_map
         self.read_length = read_length
-        self.Cr = None
         self.GkSA = None
         self.GkIFA = None
         self.GkCFPS = None
         self.Cr = Cr
+
+        SA = suffix_array_ManberMyers(Cr)
 
         self.construct_GkSA(SA)
         self.construct_GkIFA_GkCFA()
@@ -35,6 +38,9 @@ class GkArray:
         m_hat = self.read_length - self.k + 1
         return index // self.read_length * m_hat + (index % self.read_length)
 
+    def g_inverse(self, index):
+        return index + (self.k - 1)*(index // ((self.read_length) - self.k + 1))
+
     def is_P_position(self, index):
         return (index % self.read_length) <= (self.read_length - self.k)
     
@@ -45,15 +51,16 @@ class GkArray:
         for j in range(len(SA)):
             if self.is_P_position(SA[j]):
                 GkSA.append(self.g(SA[j]))
-                print (str(SA[j]) + ":" + str(self.g(SA[j])))
         
         self.GkSA = GkSA
 
     def f_q(self, index):
-        return index #fix
+        g_index = self.g_inverse(index)
+        return self.Cr[g_index : g_index + self.k]
 
     def construct_GkIFA_GkCFA(self):
-        GkIFA = GkCFA = [0] * len(self.GkSA)
+        GkIFA = [0] * len(self.GkSA)
+        GkCFA = [0] * len(self.GkSA)
         GkCFA[0] = 1
         t = 0
 
@@ -65,10 +72,10 @@ class GkArray:
                 GkCFA[t] = 0
             GkIFA[j] = t
             GkCFA[t] += 1
-
+        
         self.GkIFA = GkIFA
-        self.GkCFPS = GkCFA #will update in place
-    
+        self.GkCFPS = GkCFA[:t + 1] #will update in place
+
     def construct_GkCFPS(self):
         for i in range(1, len(self.GkCFPS)):
             self.GkCFPS[i] += self.GkCFPS[i - 1]
@@ -77,10 +84,9 @@ class GkArray:
 def main():
 
     reads = ["aacaact", "caattca", "aacaagc"]
-    SA = [13, 0, 14, 3, 17, 8, 1, 15,4, 18, 9, 20, 12, 2, 16, 7, 5, 19, 11, 6, 10]
     em = {}
 
-    tester = GkArray(reads, 3, em, 7, "aacaactcaattcaaacaagc", SA)
+    tester = GkArray(reads, 3, em, 7, "aacaactcaattcaaacaagc")
 
     print (tester.GkSA)
     print (tester.GkIFA)
