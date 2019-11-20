@@ -205,21 +205,57 @@ class SuffixTree(object):
         return self.find_substring(substring) != -1
 
 
+def process_tree(st):
+    nodes = {}
+    for edge in st.edges:
+        e = st.edges[edge]
+        source = e.source_node_index
+        dest = e.dest_node_index
+        first = e.first_char_index
+        last = e.last_char_index
+        if source not in nodes:
+            nodes[source] = [(dest,(first,last))]
+        else:
+            neighbors = nodes[source]
+            neighbors.append((dest,(first,last)))
+            nodes[source] = neighbors
+
+    return (nodes)
+
+# def dfs(visited, nodes, node):
+#     out = ""
+#     if node not in visited:
+#         # print (node)
+#         # #print (input[node[1][0]:node[1][1]+1])
+#         # out = out + input[node[1][0]:node[1][1]+1]
+#         visited.append(node)
+#         if node[0] in nodes:
+#             for nbor in nodes[node[0]]:
+                
+#                 dfs(visited, nodes, nbor)
+#                 out = out + input[nbor[1][0]:nbor[1][1]+1]
+#                 #print (out)
+#         else:
+#             #print (out)
+#             out = ""
+
+
+
+#
+
 #st = SuffixTree("aacaactcaattcaaacaagc")
-st = SuffixTree("abcabxabcd$")
-#print (type(st))
-#print (Edge)
-#print (st.edges)
+out = " "
+input = "abcabxabcd$"
+st = SuffixTree(input)
+
 #16 edges
 print (st)
 
-#print (st.nodes)
+nodes = process_tree(st)
+visited = []
+print (nodes)
+
+#dfs(visited, nodes, (0,(0,0)))
+
 #17 nodes
-for edge in st.edges:
-    #print (st.nodes)
-    print (st.edges[edge])
 
-for node in st.nodes:
-    print (node)
-
-#print (st.edges)
