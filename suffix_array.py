@@ -222,38 +222,57 @@ def process_tree(st):
 
     return (nodes)
 
-# def dfs(visited, nodes, node):
-#     out = ""
-#     if node not in visited:
-#         # print (node)
-#         # #print (input[node[1][0]:node[1][1]+1])
-#         # out = out + input[node[1][0]:node[1][1]+1]
-#         visited.append(node)
-#         if node[0] in nodes:
-#             for nbor in nodes[node[0]]:
-                
-#                 dfs(visited, nodes, nbor)
-#                 out = out + input[nbor[1][0]:nbor[1][1]+1]
-#                 #print (out)
-#         else:
-#             #print (out)
-#             out = ""
-
-
-
-#
+def dfs(node, sa):
+    offset, children = nodes[node]
+    if offset == -1:
+        sa.append(len(input) - path_length[node])
+    for c, child in sorted(children):
+        dfs(child, sa)
 
 #st = SuffixTree("aacaactcaattcaaacaagc")
 out = " "
 input = "abcabxabcd$"
 st = SuffixTree(input)
 
-#16 edges
 print (st)
 
-nodes = process_tree(st)
-visited = []
+
+
+path_length = {}
+nodes = {}
+for edge in st.edges:
+    
+    #gets edge elements
+    edge = st.edges[edge]
+    source_node = edge.source_node_index
+    dest_node = edge.dest_node_index
+    suffix_link = st.nodes[dest_node].suffix_node
+    first_index = edge.first_char_index
+
+    #creates lookup table for path length from node to root
+    prior_len = path_length.get(source_node, 0)
+    length = prior_len + (edge.last_char_index - edge.first_char_index + 1)
+    path_length[dest_node] = length 
+
+    #creates dict of nodes and children
+    if source_node not in nodes:
+        nodes[source_node] = (None, [(input[first_index], dest_node)])
+    else:
+        nbors = nodes[source_node][1]
+        nbors.append((input[first_index], dest_node))
+        nodes[source_node] = (None, nbors)
+    if suffix_link == -1:
+        nodes[dest_node] = (-1, [])
+
+
 print (nodes)
+
+sa = []
+dfs(0, sa)
+
+print (sa)
+
+#print (path_length)
 
 #dfs(visited, nodes, (0,(0,0)))
 
