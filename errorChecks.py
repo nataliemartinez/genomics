@@ -5,6 +5,12 @@ import glob
 def phred33_to_q(qual):
     return ord(qual)-33
 
+def k_mer_quality(kmer): 
+    qual_sum = 0
+    for i in range(len(kmer)): # get total of quality scores
+        qual_sum += phred33_to_q(kmer[i]) 
+    return qual_sum / 3 
+
 """
 List occurences of sequences in files
  fh = name of file 
@@ -12,7 +18,7 @@ List occurences of sequences in files
  reads_dict = dictionary maping {read: {filename: [line occurrences in file]}}
 """
 def listOccurrences(f, t, reads_dict):
-
+    min_qual = sys.maxsize
     with open(f, 'r') as fh:
         while True:
             first_line = fh.readline()
@@ -23,11 +29,15 @@ def listOccurrences(f, t, reads_dict):
             fh.readline()  # line 3 contains '+' so we skip
             qual = fh.readline().rstrip() # line 4 contains quality
 
-            qual_sum = 0
-            for i in range(len(qual)): # get total of quality scores
-                qual_sum += phred33_to_q(qual[i])
+            for i in range(len(seq) - 3): #check this 
+                # kmer = seq[i:i+3] --> might be helpful for building Gk array 
+                kmer_quals = qual[i:i+3]
+                avg_qual = k_mer_quality(kmer_quals)
+                if avg_qual < min_qual:
+                    min_qual = avg_qual
 
-            if qual_sum/len(qual) >= t:  # if avg quality > threshold add to dict {seq: {file: [occ,...]}}
+            # if avg quality > threshold add to dict {seq: {file: [occ,...]}}
+            if min_qual >= QUALITY_THRESHOLD:  # quality threshold = 1; should this be inclusive or exclusive? 
                 file_occ_dict = reads_dict.get(seq, {})
                 file_occ = file_occ_dict.get(fh.name, []) 
                 file_occ.append(name)
@@ -49,4 +59,6 @@ def readFiles():
     for k,v in k_mer_counts.items():
         print(k)
 
+
+QUALITY_THRESHOLD = 1
 readFiles()
