@@ -23,6 +23,6 @@ def suffix_array_ManberMyers(str):
 if __name__ == "__main__":
     with open("input_files/input.txt") as f:
         m = f.read()
-    str = "aacaactcaattcaaacaag"
+    str = "aacaactcaattcaaacaagc"
     output = suffix_array_ManberMyers(str)
     print (output)

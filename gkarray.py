@@ -1,4 +1,5 @@
 from naive_suffix_array import suffix_array_ManberMyers
+from suffix_array import SuffixTree
 
 class GkArray:
 
@@ -12,7 +13,10 @@ class GkArray:
         self.GkCFPS = None
         self.Cr = Cr
 
-        SA = suffix_array_ManberMyers(Cr)
+
+        #For Ukonnen suffix tree to work you have to append $ to end of Cr
+        suffix_tree = SuffixTree(Cr + "$")
+        SA = suffix_tree.build_suffix_array()
 
         self.construct_GkSA(SA)
         self.construct_GkIFA_GkCFA()
