@@ -249,7 +249,7 @@ class SuffixTree(object):
 
             for node in list(re_visit):
                 prior_len = path_length.get(re_visit[node], 0)
-                if(prior_len == 0 and re_visit[node] != 0):
+                if(re_visit[node] in re_visit and re_visit[node] != 0):
                     continue
                 else:
                     length = prior_len + path_length[node]
