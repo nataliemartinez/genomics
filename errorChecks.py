@@ -19,13 +19,21 @@ List occurences of sequences in files
 """
 def list_occurrences(f, reads_dict, cr):
     min_qual = sys.maxsize
+    first_pass = True #used for getting read length for file 
+    read_length = 0
+
+
     with open(f, 'r') as fh:
         while True:
             first_line = fh.readline()
             if len(first_line) == 0:
                 break  # end of file
             name = first_line[1:].rstrip() # line 1 contains name
-            seq = fh.readline().rstrip() # line 2 contains sequence
+            seq = fh.readline().rstrip() # line 2 contains sequence 
+            if first_pass == True: 
+                read_length = len(seq)
+                first_pass = False 
+
             fh.readline()  # line 3 contains '+' so we skip
             qual = fh.readline().rstrip() # line 4 contains quality
 
@@ -46,7 +54,7 @@ def list_occurrences(f, reads_dict, cr):
 
                 cr += seq
     
-    return reads_dict, cr
+    return reads_dict, cr, read_length
     
 """
 Read all the fastqs in our directory and build map {seq: {file: [occ,...]}}

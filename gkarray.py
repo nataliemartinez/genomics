@@ -13,6 +13,7 @@ class GkArray:
         self.GkIFA = None
         self.GkCFPS = None
         self.Cr = "" 
+        self.file_info = None # file_name : {start_idx, read_lengh}
 
 
         #For Ukonnen suffix tree to work you have to append $ to end of Cr
@@ -31,8 +32,10 @@ class GkArray:
         
         # total_reads = int(len(input_lines) / 4)
         # Cr = ""
+
         #want to call this for each file 
-        self.error_map, self.Cr = list_occurrences(self.file_names[0], self.error_map, self.Cr)
+        #read_length will be part of the "file_info" dictionary 
+        self.error_map, self.Cr, read_length = list_occurrences(self.file_names[0], self.error_map, self.Cr)
 
         # for i in range(total_reads):
         #     read = input_lines[i*4][1:].rstrip()
