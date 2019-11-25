@@ -1,17 +1,18 @@
 from naive_suffix_array import suffix_array_ManberMyers
 from suffix_array import SuffixTree
+from errorChecks import list_occurrences, k_mer_quality, phred33_to_q
 
 class GkArray:
 
-    def __init__(self, reads, k, error_map, read_length, Cr):
-        self.reads = reads
+    def __init__(self, files, k, error_map, read_length, Cr):
+        self.file_names = files
         self.k = k
-        self.error_map = error_map
+        self.error_map = {}
         self.read_length = read_length
         self.GkSA = None
         self.GkIFA = None
         self.GkCFPS = None
-        self.Cr = Cr
+        self.Cr = "" 
 
 
         #For Ukonnen suffix tree to work you have to append $ to end of Cr
@@ -24,19 +25,22 @@ class GkArray:
         
 
     def concatenate_reads(self):
-        with open(self.reads) as read_file:
-            input_lines = read_file.readlines()
+
+    # with open(self.reads) as read_file:
+    #     input_lines = read_file.readlines()
         
-        total_reads = int(len(input_lines) / 4)
-        Cr = ""
+        # total_reads = int(len(input_lines) / 4)
+        # Cr = ""
+        #want to call this for each file 
+        self.error_map, self.Cr = list_occurrences(self.file_names[0], self.error_map, self.Cr)
 
-        for i in range(total_reads):
-            read = input_lines[i*4][1:].rstrip()
-            seq = input_lines[(i*4)+1].rstrip().upper()
-            if read in self.error_map:
-                Cr += seq
+        # for i in range(total_reads):
+        #     read = input_lines[i*4][1:].rstrip()
+        #     seq = input_lines[(i*4)+1].rstrip().upper()
+        #     if read in self.error_map:
+        #         Cr += seq
 
-        self.Cr = Cr
+        # self.Cr = Cr
     
     def g(self, index):
         m_hat = self.read_length - self.k + 1

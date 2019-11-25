@@ -17,7 +17,7 @@ List occurences of sequences in files
  t = threshold for avg base quality 
  reads_dict = dictionary maping {read: {filename: [line occurrences in file]}}
 """
-def listOccurrences(f, t, reads_dict):
+def list_occurrences(f, reads_dict, cr):
     min_qual = sys.maxsize
     with open(f, 'r') as fh:
         while True:
@@ -43,8 +43,10 @@ def listOccurrences(f, t, reads_dict):
                 file_occ.append(name)
                 file_occ_dict[fh.name] = file_occ
                 reads_dict[seq] = file_occ_dict
+
+                cr += seq
     
-    return reads_dict
+    return reads_dict, cr
     
 """
 Read all the fastqs in our directory and build map {seq: {file: [occ,...]}}
@@ -54,7 +56,7 @@ def readFiles():
 
     for filename in glob.glob('*.fastq'):
         # do stuff
-        listOccurrences(filename, 5, k_mer_counts)
+        list_occurrences(filename, k_mer_counts, "")
 
     for k,v in k_mer_counts.items():
         print(k)
