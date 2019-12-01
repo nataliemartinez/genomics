@@ -5,18 +5,20 @@ class GkArray:
 
     def __init__(self, files, k):
         self.k = k
-        self.error_map = {}
+        self.valid_reads = {}
         self.GkSA = []
         self.GkIFA = None
         self.GkCFPS = None
         self.Cr = "" 
-        self.file_specs = {} # file number : {file_name, start_idx, read_length}
+        self.modified_SA
+        self.file_specs = {} # file number : {file_name, read_length, entries, prev_reads}
         self.starts = [0] #indices of starting positions of files in Cr
 
         #For Ukonnen suffix tree to work you have to append $ to end of Cr
         suffix_tree = SuffixTree(self.Cr + "$")
         SA = suffix_tree.build_suffix_array()
 
+        self.concatenate_reads(files)
         self.construct_GkSA(SA)
         self.construct_GkIFA_GkCFA()
         self.construct_GkCFPS()
@@ -25,7 +27,7 @@ class GkArray:
         file_counter = 0
         total_reads = 0
         for file in files:
-            self.error_map, self.Cr, entry = list_occurrences(file, self.error_map, self.Cr)
+            self.valid_reads, self.Cr, entry = list_occurrences(file, self.valid_reads, self.Cr)
             self.file_specs[file_counter] = entry
             self.file_specs[file_counter]["prev_read_count"] = total_reads
             self.starts.append(len(self.Cr))
@@ -49,9 +51,8 @@ class GkArray:
         total_reads_before = entry["prev_read_count"] + read_num
         return index - (self.k - 1) * total_reads_before
 
-    def g_inverse(self, g_index):
-        #needs to be written
-        return g_index
+    def g_inverse(self, index_in_gksa):
+        return self.modified_SA[index_in_gksa]
 
     # compares two kmers to each other
     def compare_kmer(self, index1, index2):
@@ -74,6 +75,7 @@ class GkArray:
         for j in range(len(SA)):
             if self.is_P_position(SA[j]):
                 self.GkSA.append(self.g(SA[j]))
+                self.modified_SA.append(SA[j])
 
     # use GkSA to construct GkIFA and GkCFA, per paper specifications
     def construct_GkIFA_GkCFA(self):
@@ -83,12 +85,10 @@ class GkArray:
         t = 0
 
         for i in range(1, len(self.GkSA)):
-            j = self.GkSA[i]
-            j_hat = self.GkSA[i - 1]
-            if not self.compare_kmer(j, j_hat):
+            if not self.compare_kmer(i, i - 1):
                 t += 1
                 GkCFA[t] = 0
-            GkIFA[j] = t
+            GkIFA[self.GkSA[i]] = t
             GkCFA[t] += 1
         
         self.GkIFA = GkIFA
