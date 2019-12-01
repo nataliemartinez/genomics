@@ -1,18 +1,24 @@
 from naive_suffix_array import suffix_array_ManberMyers
+from suffix_array import SuffixTree
+from errorChecks import list_occurrences, k_mer_quality, phred33_to_q
 
 class GkArray:
 
-    def __init__(self, reads, k, error_map, read_length, Cr):
-        self.reads = reads
+    def __init__(self, files, k, error_map, read_length, Cr):
+        self.file_names = files
         self.k = k
-        self.error_map = error_map
+        self.error_map = {}
         self.read_length = read_length
         self.GkSA = None
         self.GkIFA = None
         self.GkCFPS = None
-        self.Cr = Cr
+        self.Cr = "" 
+        self.file_info = None # file_name : {start_idx, read_lengh}
 
-        SA = suffix_array_ManberMyers(Cr)
+
+        #For Ukonnen suffix tree to work you have to append $ to end of Cr
+        suffix_tree = SuffixTree(Cr + "$")
+        SA = suffix_tree.build_suffix_array()
 
         self.construct_GkSA(SA)
         self.construct_GkIFA_GkCFA()
@@ -20,19 +26,24 @@ class GkArray:
         
 
     def concatenate_reads(self):
-        with open(self.reads) as read_file:
-            input_lines = read_file.readlines()
+
+    # with open(self.reads) as read_file:
+    #     input_lines = read_file.readlines()
         
-        total_reads = int(len(input_lines) / 4)
-        Cr = ""
+        # total_reads = int(len(input_lines) / 4)
+        # Cr = ""
 
-        for i in range(total_reads):
-            read = input_lines[i*4][1:].rstrip()
-            seq = input_lines[(i*4)+1].rstrip().upper()
-            if read in self.error_map:
-                Cr += seq
+        #want to call this for each file 
+        #read_length will be part of the "file_info" dictionary 
+        self.error_map, self.Cr, read_length = list_occurrences(self.file_names[0], self.error_map, self.Cr)
 
-        self.Cr = Cr
+        # for i in range(total_reads):
+        #     read = input_lines[i*4][1:].rstrip()
+        #     seq = input_lines[(i*4)+1].rstrip().upper()
+        #     if read in self.error_map:
+        #         Cr += seq
+
+        # self.Cr = Cr
     
     def g(self, index):
         m_hat = self.read_length - self.k + 1

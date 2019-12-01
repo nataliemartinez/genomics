@@ -76,6 +76,8 @@ class SuffixTree(object):
     """A suffix tree for string matching. Uses Ukkonen's algorithm
     for construction.
     """
+
+    sa = [] 
     def __init__(self, string, case_insensitive=False):
         """
         string
@@ -205,57 +207,60 @@ class SuffixTree(object):
         return self.find_substring(substring) != -1
 
 
-def process_tree(st):
-    nodes = {}
-    for edge in st.edges:
-        e = st.edges[edge]
-        source = e.source_node_index
-        dest = e.dest_node_index
-        first = e.first_char_index
-        last = e.last_char_index
-        if source not in nodes:
-            nodes[source] = [(dest,(first,last))]
-        else:
-            neighbors = nodes[source]
-            neighbors.append((dest,(first,last)))
-            nodes[source] = neighbors
+    def dfs(self, node, nodes, path_length):
+        offset, children = nodes[node]
+        if offset == -1:
+            self.sa.append(len(self.string) - path_length[node])
+        for c, child in sorted(children):
+            self.dfs(child, nodes, path_length)
 
-    return (nodes)
+    def pre_process_suffix_tree(self, path_length, nodes):
+        re_visit = {}
+        for edge in self.edges:
 
-# def dfs(visited, nodes, node):
-#     out = ""
-#     if node not in visited:
-#         # print (node)
-#         # #print (input[node[1][0]:node[1][1]+1])
-#         # out = out + input[node[1][0]:node[1][1]+1]
-#         visited.append(node)
-#         if node[0] in nodes:
-#             for nbor in nodes[node[0]]:
-                
-#                 dfs(visited, nodes, nbor)
-#                 out = out + input[nbor[1][0]:nbor[1][1]+1]
-#                 #print (out)
-#         else:
-#             #print (out)
-#             out = ""
+            #gets edge elements
+            edge = self.edges[edge]
+            source_node = edge.source_node_index
+            dest_node = edge.dest_node_index
+            suffix_link = self.nodes[dest_node].suffix_node
+            first_index = edge.first_char_index
 
+            #creates lookup table for path length from node to root
+            prior_len = path_length.get(source_node, 0)
+            if(prior_len == 0 and source_node != 0):
+                re_visit[dest_node] = source_node
+            length = prior_len + (edge.last_char_index - edge.first_char_index + 1)
+            path_length[dest_node] = length 
 
+            #creates dict of nodes and children
+            if source_node not in nodes:
+                nodes[source_node] = (None, [(self.string[first_index], dest_node)])
+            else:
+                nbors = nodes[source_node][1]
+                nbors.append((self.string[first_index], dest_node))
+                nodes[source_node] = (None, nbors)
+            if suffix_link == -1:
+                nodes[dest_node] = (-1, [])
 
-#
+        """loop to fix path_length for nodes that 
+           didn't have prior length on first iteration
+        """
+        while len(re_visit) > 0:
 
-#st = SuffixTree("aacaactcaattcaaacaagc")
-out = " "
-input = "abcabxabcd$"
-st = SuffixTree(input)
-
-#16 edges
-print (st)
-
-nodes = process_tree(st)
-visited = []
-print (nodes)
-
-#dfs(visited, nodes, (0,(0,0)))
-
-#17 nodes
-
+            for node in list(re_visit):
+                prior_len = path_length.get(re_visit[node], 0)
+                if(re_visit[node] in re_visit and re_visit[node] != 0):
+                    continue
+                else:
+                    length = prior_len + path_length[node]
+                    path_length[node] = length
+                    re_visit.pop(node)
+            
+        return path_length, nodes
+        
+    def build_suffix_array(self):
+        path_length = {}
+        nodes = {}
+        path_length, nodes = (self.pre_process_suffix_tree(path_length, nodes))
+        self.dfs(0,nodes, path_length)
+        return self.sa[1:]
