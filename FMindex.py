@@ -1,5 +1,5 @@
 import glob
-import timeit
+import time
 from suffix_array import SuffixTree
 
 def suffixArray(s):
@@ -168,13 +168,35 @@ def readFile(f):
 
 def buildIndex(): 
     concat_reads = []
-
+    start_indices = []
+    start = 0
     for filename in glob.glob('./input_files/*.fastq'):
        # do stuff
-       concat_reads.append(readFile(filename))
+        seq = readFile(filename)
+        start_indices.append(start)
+        start += len(seq)
+
+        concat_reads.append(seq)
 
     fm = FmIndex(''.join(concat_reads))
-    print(fm.hasSubstring('ACT'))
+
+    return fm, start_indices
+
+def report_occs(fm):
+    fm.occurrences("ACCCC")
+    return
 
 
-buildIndex()
+def benchmark():
+    start = time.time()
+    FM, si = buildIndex()
+    end = time.time()
+    print(str(end - start) + " seconds to build index")
+
+    start = time.time()
+    report_occs(FM)
+    end = time.time()
+    print(str(end - start) + " seconds to report occurences")
+
+
+benchmark()
