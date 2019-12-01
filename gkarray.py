@@ -1,74 +1,81 @@
-from naive_suffix_array import suffix_array_ManberMyers
 from suffix_array import SuffixTree
-from errorChecks import list_occurrences, k_mer_quality, phred33_to_q
+from errorChecks import list_occurrences
 
 class GkArray:
 
-    def __init__(self, files, k, error_map, read_length, Cr):
-        self.file_names = files
+    def __init__(self, files, k):
         self.k = k
         self.error_map = {}
-        self.read_length = read_length
-        self.GkSA = None
+        self.GkSA = []
         self.GkIFA = None
         self.GkCFPS = None
         self.Cr = "" 
-        self.file_info = None # file_name : {start_idx, read_lengh}
-
+        self.file_specs = {} # file number : {file_name, start_idx, read_length}
+        self.starts = [0] #indices of starting positions of files in Cr
 
         #For Ukonnen suffix tree to work you have to append $ to end of Cr
-        suffix_tree = SuffixTree(Cr + "$")
+        suffix_tree = SuffixTree(self.Cr + "$")
         SA = suffix_tree.build_suffix_array()
 
         self.construct_GkSA(SA)
         self.construct_GkIFA_GkCFA()
         self.construct_GkCFPS()
-        
 
-    def concatenate_reads(self):
+    def concatenate_reads(self, files):
+        file_counter = 0
+        total_reads = 0
+        for file in files:
+            self.error_map, self.Cr, entry = list_occurrences(file, self.error_map, self.Cr)
+            self.file_specs[file_counter] = entry
+            self.file_specs[file_counter]["prev_read_count"] = total_reads
+            self.starts.append(len(self.Cr))
 
-    # with open(self.reads) as read_file:
-    #     input_lines = read_file.readlines()
-        
-        # total_reads = int(len(input_lines) / 4)
-        # Cr = ""
-
-        #want to call this for each file 
-        #read_length will be part of the "file_info" dictionary 
-        self.error_map, self.Cr, read_length = list_occurrences(self.file_names[0], self.error_map, self.Cr)
-
-        # for i in range(total_reads):
-        #     read = input_lines[i*4][1:].rstrip()
-        #     seq = input_lines[(i*4)+1].rstrip().upper()
-        #     if read in self.error_map:
-        #         Cr += seq
-
-        # self.Cr = Cr
+            file_counter += 1
+            total_reads += entry["entries"]
     
+    #O(n), could be faster with modified binary search?
+    # get the file number corresponding to a certain index for lookup in file_specs
+    def get_file(self, index):
+        for i in range(len(self.starts) - 1):
+            if index >= self.starts[i] and index < self.starts[i + 1]:
+                return i
+        return None
+
+    # transform index of Cr to index for GkSA, modified for multiple files
     def g(self, index):
-        m_hat = self.read_length - self.k + 1
-        return index // self.read_length * m_hat + (index % self.read_length)
+        file_num = self.get_file(index)
+        entry = self.file_specs[file_num]
+        read_num = (index - self.starts[file_num]) // entry["read_length"]
+        total_reads_before = entry["prev_read_count"] + read_num
+        return index - (self.k - 1) * total_reads_before
 
-    def g_inverse(self, index):
-        return index + (self.k - 1)*(index // ((self.read_length) - self.k + 1))
+    def g_inverse(self, g_index):
+        #needs to be written
+        return g_index
 
+    # compares two kmers to each other
+    def compare_kmer(self, index1, index2):
+        g_index1 = self.g_inverse(index1)
+        g_index2 = self.g_inverse(index2)
+
+        for i in range (self.k + 1):
+            if self.Cr[g_index1 + i] != self.Cr[g_index2 + i]:
+                return False
+        return True
+
+    # determines whether an index is a valid kmer offset within a read
     def is_P_position(self, index):
-        return (index % self.read_length) <= (self.read_length - self.k)
+        file_num = self.get_file(index)
+        read_length = self.file_specs[file_num]["read_length"]
+        return ((index - self.starts[file_num]) % read_length) <= (read_length - self.k)
     
+    # use suffix array to construct GkSA, per paper specifications
     def construct_GkSA(self, SA):
-
-        GkSA = []
-
         for j in range(len(SA)):
             if self.is_P_position(SA[j]):
-                GkSA.append(self.g(SA[j]))
-        
-        self.GkSA = GkSA
+                self.GkSA.append(self.g(SA[j]))
 
-    def f_q(self, index):
-        g_index = self.g_inverse(index)
-        return self.Cr[g_index : g_index + self.k]
-
+    # use GkSA to construct GkIFA and GkCFA, per paper specifications
     def construct_GkIFA_GkCFA(self):
         GkIFA = [0] * len(self.GkSA)
         GkCFA = [0] * len(self.GkSA)
@@ -78,7 +85,7 @@ class GkArray:
         for i in range(1, len(self.GkSA)):
             j = self.GkSA[i]
             j_hat = self.GkSA[i - 1]
-            if self.f_q(j) != self.f_q(j_hat):
+            if not self.compare_kmer(j, j_hat):
                 t += 1
                 GkCFA[t] = 0
             GkIFA[j] = t
@@ -87,24 +94,40 @@ class GkArray:
         self.GkIFA = GkIFA
         self.GkCFPS = GkCFA[:t + 1] #will update in place
 
+    # use GkCFA to construct GkCFPS, per paper specifications
     def construct_GkCFPS(self):
         for i in range(1, len(self.GkCFPS)):
             self.GkCFPS[i] += self.GkCFPS[i - 1]
 
 
-def main():
+    def get_rank(self, read_num, read_index, file_num):
+        j = self.g(read_num * self.read_length + read_index + self.starts[file_num])
+        return self.GkIFA[j]
 
-    reads = ["aacaact", "caattca", "aacaagc"]
-    em = {}
+    # Paper Query 4
+    # Given a desired kmer where the position is known, count all occurences of kmer
+    def get_total_occurence_count(self, read_num, read_index, file_num):
+        t = self.get_rank(read_num, read_index, file_num)
+        return self.GkCFPS[t] - self.GkCFPS[t - 1]
 
-    tester = GkArray(reads, 3, em, 7, "aacaactcaattcaaacaagc")
+    # Paper Query 3
+    # Given a desired kmer where the position is known, return a list of indices of occurences
+    def get_all_positions(self, read_num, read_index, file_num):
+        t = self.get_rank(read_num, read_index, file_num)
+        upper = self.GkCFPS[t]
+        lower = self.GkCFPS[t - 1]
+        return self.GkSA[lower : upper + 1]
 
-    print (tester.GkSA)
-    print (tester.GkIFA)
-    print (tester.GkCFPS)
-
-
-main()
+    #Paper Query 1 and 2
+    # Given a desired kmer where the position is known, return a list of reads
+    # Answer Query 2 by getting the length of the result returned
+    def get_reads(self, read_num, read_index, file_num):
+        l = self.get_all_positions(read_num, read_index, file_num)
+        m = 0 #get length of read for that read?
+        result = []
+        for i in l:
+            result.append(self.g_inverse(i) // m)
+        return result
 
 
 

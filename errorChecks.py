@@ -21,7 +21,7 @@ def list_occurrences(f, reads_dict, cr):
     min_qual = sys.maxsize
     first_pass = True #used for getting read length for file 
     read_length = 0
-
+    entries = 0
 
     with open(f, 'r') as fh:
         while True:
@@ -53,14 +53,19 @@ def list_occurrences(f, reads_dict, cr):
                 reads_dict[seq] = file_occ_dict
 
                 cr += seq
+                entries += 1
+        
+        entry = {"file" : f, "read_length" : read_length, "entries" : entries}
     
-    return reads_dict, cr, read_length
+    return reads_dict, cr, entry
     
 """
 Read all the fastqs in our directory and build map {seq: {file: [occ,...]}}
 """
 def readFiles(): 
     k_mer_counts = {} # map of {seq: {file: [occ,...]}}
+
+    file_counter = 0
 
     for filename in glob.glob('*.fastq'):
         # do stuff
