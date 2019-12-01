@@ -10,7 +10,7 @@ class GkArray:
         self.GkIFA = None
         self.GkCFPS = None
         self.Cr = "" 
-        self.modified_SA
+        self.modified_SA = []
         self.file_specs = {} # file number : {file_name, read_length, entries, prev_reads}
         self.starts = [0] #indices of starting positions of files in Cr
 
