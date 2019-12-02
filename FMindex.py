@@ -1,8 +1,15 @@
 import glob
 import time
+from timeit import default_timer as timer
 from suffix_array import SuffixTree
+from divsufsort import SuffixArray
+
+def CsuffixArray(s):
+    """ C library version 10x fast """
+    return SuffixArray(s).sa
 
 def suffixArray(s):
+    """ Our version """
     return SuffixTree(s + '$').build_suffix_array()
 
 def bwtFromSa(t, sa=None):
@@ -188,14 +195,14 @@ def report_occs(fm):
 
 
 def benchmark():
-    start = time.time()
+    start = timer()
     FM, si = buildIndex()
-    end = time.time()
+    end = timer()
     print(str(end - start) + " seconds to build index")
 
-    start = time.time()
+    start = timer()
     report_occs(FM)
-    end = time.time()
+    end = timer()
     print(str(end - start) + " seconds to report occurences")
 
 
