@@ -129,6 +129,40 @@ class GkArray:
             result.append(self.g_inverse(i) // m)
         return result
 
+    # Inputs: text, modified_SA, and pattern
+    # Returns: index in text if found, -1 if not found (shouldn't happen)
+    def find_kmer(self, t, sa, p):
+        t = t + '$' # t already has terminator
+ 
+        if len(t) == 1: return 1
+        l, r = 0, len(sa) # invariant: sa[l] < p < sa[r]
+        while True:
+            c = (l + r) // 2
+            # determine whether p < T[sa[c]:] by doing comparisons
+            # starting from left-hand sides of p and T[sa[c]:]
+            plt = True # assume p < T[sa[c]:] until proven otherwise
+            i = 0
+            while i < len(p) and sa[c]+i < len(t):
+                if p[i] < t[sa[c]+i]:
+                    break # p < T[sa[c]:]
+                elif p[i] > t[sa[c]+i]:
+                    plt = False
+                    break # p > T[sa[c]:]
+                i += 1 # tied so far
+            if plt:
+                if c == l + 1:
+                    if c < len(t):
+                        return self.g(c) # return index transformed to original text
+                    else:
+                        return -1 # not found, not expected
+                r = c
+            else:
+                if c == r - 1:
+                    if c < len(t):
+                        return self.g(r) # return index transformed to original text
+                    else:
+                        return -1 # not found, not expected
+                l = c
 
 
 
