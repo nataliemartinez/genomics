@@ -35,12 +35,14 @@ def list_occurrences(self, f):
             self.reads_dict[seq] = file_occ_dict
     
 def find_sequence(self, seq): 
-    occurrences = [] #lists of 
+    occurrences = [] #mapping of file to list of reads that k-mer occurs in
     for key in self.reads_dict.keys(): 
         if seq in key: 
             occurrences.append(self.reads_dict.get(key))
     return occurrences
 
+
+# find number of occurences from all files
 def total_reads(self, seq):
     file_occurrences = find_sequence(self, seq)
     total_occurrences = 0
