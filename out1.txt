@@ -1,0 +1,5 @@
+[
+    {'input_files/test.txt': ['SRR353630.8901 HWUSI-EAS168_27:5:1:2190:3087 length=150']}, 
+    {'input_files/test.txt': ['SRR353630.8902 HWUSI-EAS168_27:5:1:2763:3096 length=150']}
+]
+

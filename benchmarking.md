@@ -31,7 +31,7 @@ phix_reads
 
 
 ~100kb
-1000 genomies
+1000 genomes
 
 
 hastable
