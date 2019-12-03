@@ -99,21 +99,18 @@ class GkArray:
         for i in range(1, len(self.GkCFPS)):
             self.GkCFPS[i] += self.GkCFPS[i - 1]
 
-
-    def get_rank(self, read_num, read_index, file_num):
-        j = self.g(read_num * self.read_length + read_index + self.starts[file_num])
-        return self.GkIFA[j]
-
     # Paper Query 4
     # Given a desired kmer where the position is known, count all occurences of kmer
-    def get_total_occurence_count(self, read_num, read_index, file_num):
-        t = self.get_rank(read_num, read_index, file_num)
+    def get_total_occurence_count(self, kmer):
+        kmer_index = self.find_kmer(kmer)
+        t = self.GkIFA[kmer_index]
         return self.GkCFPS[t] - self.GkCFPS[t - 1]
 
     # Paper Query 3
     # Given a desired kmer where the position is known, return a list of indices of occurences
-    def get_all_positions(self, read_num, read_index, file_num):
-        t = self.get_rank(read_num, read_index, file_num)
+    def get_all_positions(self, kmer):
+        kmer_index = self.find_kmer(kmer)
+        t = self.GkIFA[kmer_index]
         upper = self.GkCFPS[t]
         lower = self.GkCFPS[t - 1]
         return self.GkSA[lower : upper + 1]
@@ -121,31 +118,31 @@ class GkArray:
     #Paper Query 1 and 2
     # Given a desired kmer where the position is known, return a list of reads
     # Answer Query 2 by getting the length of the result returned
-    def get_reads(self, read_num, read_index, file_num):
-        l = self.get_all_positions(read_num, read_index, file_num)
-        m = 0 #get length of read for that read?
+    def get_reads(self, kmer):
+        l = self.get_all_positions(kmer)
         result = []
         for i in l:
+            m = self.file_specs[self.get_file(i)]["read_length"]
             result.append(self.g_inverse(i) // m)
         return result
 
-    # Inputs: text, modified_SA, and pattern
+    # Inputs: pattern
     # Returns: index in text if found, -1 if not found (shouldn't happen)
-    def find_kmer(self, t, sa, p):
-        t = t + '$' # t already has terminator
+    def find_kmer(self, p):
+        t = self.Cr + '$' # t already has terminator
  
         if len(t) == 1: return 1
-        l, r = 0, len(sa) # invariant: sa[l] < p < sa[r]
+        l, r = 0, len(self.modified_SA) # invariant: sa[l] < p < sa[r]
         while True:
             c = (l + r) // 2
             # determine whether p < T[sa[c]:] by doing comparisons
             # starting from left-hand sides of p and T[sa[c]:]
             plt = True # assume p < T[sa[c]:] until proven otherwise
             i = 0
-            while i < len(p) and sa[c]+i < len(t):
-                if p[i] < t[sa[c]+i]:
+            while i < len(p) and self.modified_SA[c]+i < len(t):
+                if p[i] < t[self.modified_SA[c]+i]:
                     break # p < T[sa[c]:]
-                elif p[i] > t[sa[c]+i]:
+                elif p[i] > t[self.modified_SA[c]+i]:
                     plt = False
                     break # p > T[sa[c]:]
                 i += 1 # tied so far
