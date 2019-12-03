@@ -103,6 +103,8 @@ class GkArray:
     # Given a desired kmer where the position is known, count all occurences of kmer
     def get_total_occurence_count(self, kmer):
         kmer_index = self.find_kmer(kmer)
+        if kmer_index < 0:
+            return 0
         t = self.GkIFA[kmer_index]
         return self.GkCFPS[t] - self.GkCFPS[t - 1]
 
@@ -110,6 +112,8 @@ class GkArray:
     # Given a desired kmer where the position is known, return a list of indices of occurences
     def get_all_positions(self, kmer):
         kmer_index = self.find_kmer(kmer)
+        if kmer_index < 0:
+            return []
         t = self.GkIFA[kmer_index]
         upper = self.GkCFPS[t]
         lower = self.GkCFPS[t - 1]
@@ -120,10 +124,16 @@ class GkArray:
     # Answer Query 2 by getting the length of the result returned
     def get_reads(self, kmer):
         l = self.get_all_positions(kmer)
-        result = []
+        result = {}
         for i in l:
-            m = self.file_specs[self.get_file(i)]["read_length"]
-            result.append(self.g_inverse(i) // m)
+            file_num = self.get_file(i)
+            m = self.file_specs[file_num]["read_length"]
+            read_num = (self.g_inverse(i) - self.starts[file_num]) // m
+            file_name = self.file_specs[file_num]["file"]
+            if file_name in result:
+                result[file_name].append(read_num)
+            else:
+                result[file_name] = [read_num]
         return result
 
     # Inputs: pattern
