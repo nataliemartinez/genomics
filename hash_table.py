@@ -37,10 +37,16 @@ class hash_table():
                 self.reads_dict[seq] = file_occ_dict
         
     def find_sequence(self, seq): 
-        occurrences = [] #mapping of file to list of reads that k-mer occurs in
+        occurrences = {} #mapping of file to list of reads that k-mer occurs in 
+
         for key in self.reads_dict.keys(): 
             if seq in key: 
-                occurrences.append(self.reads_dict.get(key))
+                file_locations = self.reads_dict.get(key) #gets {{file1: [ids]}, {file2: [ids]}} 
+                for f in file_locations.keys(): 
+                    new_file_locations = file_locations[f]
+                    existing_locations = occurrences.get(f, [])
+                    existing_locations += new_file_locations 
+                    occurrences[f] = existing_locations           
         return occurrences
 
 
@@ -49,5 +55,5 @@ class hash_table():
         file_occurrences = self.find_sequence(seq)
         total_occurrences = 0
         for f in file_occurrences:
-            total_occurrences += len(f.values())
+            total_occurrences += len(file_occurrences[f])
         return total_occurrences
