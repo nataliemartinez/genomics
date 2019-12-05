@@ -2,11 +2,8 @@ import glob
 import tracemalloc
 from timeit import default_timer as timer
 from gkarray import GkArray
-#from FMindex import FmIndex
 from hash_table import hash_table
 #import unittest
-
-
 
 
 def test_100kb():
@@ -40,7 +37,7 @@ def test_100kb():
     #building FM Index time and memory test
     tracemalloc.start()
     fm_start = timer()
-    fm_index = 0
+    #fm_index = FmIndex("Build")
     fm_memory = tracemalloc.get_tracemalloc_memory()
     fm_end = timer()
     tracemalloc.stop()
@@ -59,7 +56,7 @@ def test_100kb():
     #building Gk Array time and memory test
     tracemalloc.start()
     gk_start = timer()
-    gk_array = GkArray(['input_files/test.txt'], 3)
+    gk_array = GkArray(files, 3)
     gk_memory = tracemalloc.get_tracemalloc_memory()
     gk_end = timer()
     tracemalloc.stop()

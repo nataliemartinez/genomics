@@ -15,10 +15,10 @@ class GkArray:
         self.starts = [0] #indices of starting positions of files in Cr
 
         #For Ukonnen suffix tree to work you have to append $ to end of Cr
+        
+        self.concatenate_reads(files)
         suffix_tree = SuffixTree(self.Cr + "$")
         SA = suffix_tree.build_suffix_array()
-
-        self.concatenate_reads(files)
         self.construct_GkSA(SA)
         self.construct_GkIFA_GkCFA()
         self.construct_GkCFPS()
