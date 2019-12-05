@@ -92,8 +92,8 @@ class FmIndex():
         if t[-1] != '$':
             t += '$' # add dollar if not there already
         # Get BWT string and offset of $ within it
-        sa = suffixArray(t)
-        self.bwt, self.dollarRow = bwtFromSa(t, sa)
+        sa = self.suffixArray(t)
+        self.bwt, self.dollarRow = self.bwtFromSa(t, sa)
         # Get downsampled suffix array, taking every 1 out of 'ssaIval'
         # elements w/r/t T
         self.ssa = self.downsampleSuffixArray(sa, ssaIval)
@@ -110,6 +110,24 @@ class FmIndex():
         for c, count in sorted(tots.items()):
             self.first[c] = totc
             totc += count
+
+    def suffixArray(self, s):
+        """ Our version """
+        return SuffixTree(s + '$').build_suffix_array()
+
+    def bwtFromSa(self, t, sa=None):
+        ''' Given T, returns BWT(T) by way of the suffix array. '''
+        bw = []
+        dollarRow = None
+        if sa is None:
+            sa = self.suffixArray(t)
+        for si in sa:
+            if si == 0:
+                dollarRow = len(bw)
+                bw.append('$')
+            else:
+                bw.append(t[si-1])
+        return ''.join(bw), dollarRow # return string-ized version of list bw
     
     def count(self, c):
         ''' Return number of occurrences of characters < c '''
@@ -248,18 +266,18 @@ class FmIndex():
 
         return fm, start_indices, file_map
 
-def benchmark():
-    """ Rough benchmarking method """
-    start = timer()
-    # Needs to pass in $ to call method from it
-    FM, start_indices, file_map = FmIndex('$').buildIndex(glob.glob('./input_files/1mb_genome/*.fastq'))
-    end = timer()
-    print(str(end - start) + " seconds to build index")
+# def benchmark():
+#     """ Rough benchmarking method """
+#     start = timer()
+#     # Needs to pass in $ to call method from it
+#     FM, start_indices, file_map = FmIndex('$').buildIndex(glob.glob('./input_files/1mb_genome/*.fastq'))
+#     end = timer()
+#     print(str(end - start) + " seconds to build index")
 
-    start = timer()
-    occs = FM.occurrences("ACCCC")
-    files = FM.report_files(occs, start_indices, file_map)
-    end = timer()
-    print(str(end - start) + " seconds to report occurences")
+#     start = timer()
+#     occs = FM.occurrences("ACCCC")
+#     files = FM.report_files(occs, start_indices, file_map)
+#     end = timer()
+#     print(str(end - start) + " seconds to report occurences")
 
-benchmark()
+# benchmark()
