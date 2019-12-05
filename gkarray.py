@@ -34,6 +34,7 @@ class GkArray:
 
             file_counter += 1
             total_reads += entry["entries"]
+
     
     #O(n), could be faster with modified binary search?
     # get the file number corresponding to a certain index for lookup in file_specs
@@ -125,16 +126,20 @@ class GkArray:
     def get_reads(self, kmer):
         l = self.get_all_positions(kmer)
         result = {}
+        cardinality = 0
         for i in l:
             file_num = self.get_file(i)
             m = self.file_specs[file_num]["read_length"]
             read_num = (self.g_inverse(i) - self.starts[file_num]) // m
             file_name = self.file_specs[file_num]["file"]
             if file_name in result:
-                result[file_name].append(read_num)
+                if read_num not in result[file_name]:
+                    result[file_name].append(read_num)
+                    cardinality += 1
             else:
                 result[file_name] = [read_num]
-        return result
+                cardinality += 1
+        return result, cardinality
 
     # Inputs: pattern
     # Returns: index in text if found, -1 if not found (shouldn't happen)
