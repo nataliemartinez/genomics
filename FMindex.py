@@ -159,97 +159,106 @@ class FmIndex():
         l, r = self.range(p)
         return [ self.resolve(x) for x in range(l, r) ]
 
-
-""" Report files that occs are from """
-def report_files(fm, occs, si):
-
-    files = []
-    for o in occs:
-        files.append(find_file_binSearch(si, o))
-
-    return files
-
-""" find file from Cr index in O(k) time """
-def find_file(si, x): 
-    for i in range(len(si) - 1):
-        if x >= si[i] and x < si[i + 1]:
-            return i
-    return -1
- 
-""" Find file from Cr index in O(logk) time """
-def find_file_binSearch(arr, x): 
-    l = 0
-    r = len(arr)
-    mid = (l + r)//2
-    prev = mid + 1
-    while l <= r: 
-  
-        mid = (l + r)//2 
-          
-        # return if x is in tight range
-        if arr[mid] <= x and x < arr[prev] and mid == prev - 1: 
-            return mid 
-  
-        # If x is greater, ignore left half 
-        elif arr[mid] < x: 
-            l = mid + 1
-            prev = mid + 1
-  
-        # If x is smaller, ignore right half 
-        else: 
-            r = mid - 1
-            prev = mid - 1
-      
-    # If we reach here, then the element at the edge
-    return mid
-
-""" Read a fastq in and return its concatenated reads """
-def readFile(f):
-    sequence = []
-    with open(f, 'r') as fh:
-        while True:
-            first_line = fh.readline()
-            if len(first_line) == 0:
-                break  # end of file
-            _ = first_line[1:].rstrip() # line 1 contains name
-            seq = fh.readline().rstrip() # line 2 contains sequence
-            fh.readline()  # line 3 contains '+' so we skip
-            _ = fh.readline().rstrip() # line 4 contains quality
-
-            sequence.append(seq)
+    ####### Augmented section ########
     
-    return ''.join(sequence)
+    def report_files(self, occs, si, file_map):
+        """ Report files that occs are from """
+        files = []
+        for o in occs:
+            files.append(file_map[self.find_file_binSearch(si, o)])
 
-""" This function grabs all input fastq files, returns FMIndex and file index """
-def buildIndex(): 
-    concat_reads = []
-    start_indices = []
-    start = 0
-    for filename in glob.glob('./input_files/1mb_genome/*.fastq'):
-       # do stuff
-        seq = readFile(filename)
-        start_indices.append(start)
-        start += len(seq)
+        return files
 
-        concat_reads.append(seq)
+    # def find_file(self, si, x): 
+    #     """ find file from Cr index in O(k) time """
+    #     for i in range(len(si) - 1):
+    #         if x >= si[i] and x < si[i + 1]:
+    #             return i
+    #     return -1
+    
+    def find_file_binSearch(self, arr, x):
+        """ Find file from Cr index in O(logk) time """ 
+        l = 0
+        r = len(arr)
+        mid = (l + r)//2
+        prev = mid + 1
+        while l <= r: 
+    
+            mid = (l + r)//2 
+            
+            # return if x is in tight range
+            if arr[mid] <= x and x < arr[prev] and mid == prev - 1: 
+                return mid 
+    
+            # If x is greater, ignore left half 
+            elif arr[mid] < x: 
+                l = mid + 1
+                prev = mid + 1
+    
+            # If x is smaller, ignore right half 
+            else: 
+                r = mid - 1
+                prev = mid - 1
+        
+        # If we reach here, then the element at the edge
+        return mid
 
-    start_indices.append(start) # add end of file index
-    Cr = ''.join(concat_reads)
-    fm = FmIndex(Cr)
+    
+    def readFile(self, f):
+        """ Read a fastq in and return its concatenated reads """
+        sequence = []
+        with open(f, 'r') as fh:
+            while True:
+                first_line = fh.readline()
+                if len(first_line) == 0:
+                    break  # end of file
+                _ = first_line[1:].rstrip() # line 1 contains name
+                seq = fh.readline().rstrip() # line 2 contains sequence
+                fh.readline()  # line 3 contains '+' so we skip
+                _ = fh.readline().rstrip() # line 4 contains quality
 
-    return fm, start_indices
+                sequence.append(seq)
+        
+        return ''.join(sequence)
 
-""" Rough benchmarking method """
+    
+    def buildIndex(self, file_list):
+        """ This function grabs all input fastq files, returns FMIndex, start_indices, and file index """ 
+        concat_reads = []
+        start_indices = []
+        file_map = {}
+        start = 0
+        file_counter = 0
+        for filename in file_list:
+        # do stuff
+            seq = self.readFile(filename)
+            concat_reads.append(seq)
+            
+            start_indices.append(start)
+            start += len(seq)
+
+            file_map[file_counter] = filename
+            file_counter += 1
+
+        start_indices.append(start) # add end of file index
+    
+
+        Cr = ''.join(concat_reads)
+        fm = FmIndex(Cr)
+
+        return fm, start_indices, file_map
+
 def benchmark():
+    """ Rough benchmarking method """
     start = timer()
-    FM, start_indices = buildIndex()
-
+    # Needs to pass in $ to call method from it
+    FM, start_indices, file_map = FmIndex('$').buildIndex(glob.glob('./input_files/1mb_genome/*.fastq'))
     end = timer()
     print(str(end - start) + " seconds to build index")
 
     start = timer()
     occs = FM.occurrences("ACCCC")
-    report_files(FM, occs, start_indices)
+    files = FM.report_files(occs, start_indices, file_map)
     end = timer()
     print(str(end - start) + " seconds to report occurences")
 
