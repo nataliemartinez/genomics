@@ -1,12 +1,17 @@
+import sys
 import glob
-import time
+import ctypes
 from timeit import default_timer as timer
 from suffix_array import SuffixTree
-from divsufsort import SuffixArray
+from divsufsort import SuffixArray, divsufsort, divbwt
 
 def CsuffixArray(s):
     """ C library version 10x fast """
-    return SuffixArray(s).sa
+    return divsufsort(s, (ctypes.c_int * len(s))())
+
+def CbwtFromSa(t, sa=None):
+    """ C library """
+    return divbwt(t)
 
 def suffixArray(s):
     """ Our version """
@@ -155,8 +160,51 @@ class FmIndex():
         return [ self.resolve(x) for x in range(l, r) ]
 
 
+""" Report files that occs are from """
+def report_files(fm, occs, si):
+
+    files = []
+    for o in occs:
+        files.append(find_file_binSearch(si, o))
+
+    return files
+
+""" find file from Cr index in O(k) time """
+def find_file(si, x): 
+    for i in range(len(si) - 1):
+        if x >= si[i] and x < si[i + 1]:
+            return i
+    return -1
+ 
+""" Find file from Cr index in O(logk) time """
+def find_file_binSearch(arr, x): 
+    l = 0
+    r = len(arr)
+    mid = (l + r)//2
+    prev = mid + 1
+    while l <= r: 
+  
+        mid = (l + r)//2 
+          
+        # return if x is in tight range
+        if arr[mid] <= x and x < arr[prev] and mid == prev - 1: 
+            return mid 
+  
+        # If x is greater, ignore left half 
+        elif arr[mid] < x: 
+            l = mid + 1
+            prev = mid + 1
+  
+        # If x is smaller, ignore right half 
+        else: 
+            r = mid - 1
+            prev = mid - 1
+      
+    # If we reach here, then the element at the edge
+    return mid
+
+""" Read a fastq in and return its concatenated reads """
 def readFile(f):
-    """ Read all the fastq files into our FMindex """
     sequence = []
     with open(f, 'r') as fh:
         while True:
@@ -172,12 +220,12 @@ def readFile(f):
     
     return ''.join(sequence)
 
-
+""" This function grabs all input fastq files, returns FMIndex and file index """
 def buildIndex(): 
     concat_reads = []
     start_indices = []
     start = 0
-    for filename in glob.glob('./input_files/*.fastq'):
+    for filename in glob.glob('./input_files/1mb_genome/*.fastq'):
        # do stuff
         seq = readFile(filename)
         start_indices.append(start)
@@ -185,25 +233,24 @@ def buildIndex():
 
         concat_reads.append(seq)
 
-    fm = FmIndex(''.join(concat_reads))
+    start_indices.append(start) # add end of file index
+    Cr = ''.join(concat_reads)
+    fm = FmIndex(Cr)
 
     return fm, start_indices
 
-def report_occs(fm):
-    fm.occurrences("ACCCC")
-    return
-
-
+""" Rough benchmarking method """
 def benchmark():
     start = timer()
-    FM, si = buildIndex()
+    FM, start_indices = buildIndex()
+
     end = timer()
     print(str(end - start) + " seconds to build index")
 
     start = timer()
-    report_occs(FM)
+    occs = FM.occurrences("ACCCC")
+    report_files(FM, occs, start_indices)
     end = timer()
     print(str(end - start) + " seconds to report occurences")
-
 
 benchmark()
