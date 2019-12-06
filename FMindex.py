@@ -88,12 +88,40 @@ class FmIndex():
                 ssa[i] = suf
         return ssa
     
-    def __init__(self, t, cpIval=4, ssaIval=4):
-        if t[-1] != '$':
-            t += '$' # add dollar if not there already
+    def __init__(self, file_list, cpIval=4, ssaIval=4):
+        
+        # concat_reads = []
+
+        # for filename in file_list:
+        # # do stuff
+        #     seq = self.readFile(filename)
+        #     self.concat_reads.append(seq)
+
+        self.concat_reads = []
+        self.start_indices = []
+        self.file_map = {}
+        self.start = 0
+        self.file_counter = 0
+        for filename in file_list:
+        # do stuff
+            seq = self.readFile(filename)
+            self.concat_reads.append(seq)
+            
+            self.start_indices.append(self.start)
+            self.start += len(seq)
+
+            self.file_map[self.file_counter] = filename
+            self.file_counter += 1
+
+        self.start_indices.append(self.start) # add end of file index
+        self.Cr = ''.join(self.concat_reads)
+
+
+        if self.Cr[-1] != '$':
+            self.Cr += '$' # add dollar if not there already
         # Get BWT string and offset of $ within it
-        sa = self.suffixArray(t)
-        self.bwt, self.dollarRow = self.bwtFromSa(t, sa)
+        sa = self.suffixArray(self.Cr)
+        self.bwt, self.dollarRow = self.bwtFromSa(self.Cr, sa)
         # Get downsampled suffix array, taking every 1 out of 'ssaIval'
         # elements w/r/t T
         self.ssa = self.downsampleSuffixArray(sa, ssaIval)
@@ -110,6 +138,8 @@ class FmIndex():
         for c, count in sorted(tots.items()):
             self.first[c] = totc
             totc += count
+
+        #return self.start_indices, self.file_map
 
     def suffixArray(self, s):
         """ Our version """
