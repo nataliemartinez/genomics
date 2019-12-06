@@ -1,7 +1,7 @@
 import glob
-import tracemalloc
 from timeit import default_timer as timer
 from gkarray import GkArray
+from pympler import asizeof
 #import unittest
 
 
@@ -16,12 +16,12 @@ def test_100kb():
 
 
     #building Gk Array time and memory test
-    tracemalloc.start()
+
     gk_start = timer()
     gk_array = GkArray(files, 3)
-    gk_memory = tracemalloc.get_tracemalloc_memory()
+    gk_memory = asizeof.asizeof(gk_array)
     gk_end = timer()
-    tracemalloc.stop()
+
 
     #query time
     q_start = timer()
@@ -58,12 +58,12 @@ def test_1mb():
 
 
     #building Gk Array time and memory test
-    tracemalloc.start()
+
     gk_start = timer()
     gk_array = GkArray(files, 3)
-    gk_memory = tracemalloc.get_tracemalloc_memory()
+    gk_memory = asizeof.asizeof(gk_array)
     gk_end = timer()
-    tracemalloc.stop()
+
 
     #query time
     q_start = timer()
@@ -95,17 +95,15 @@ def test_100mb():
     files = []
 
     #Collect all file names in collection
-    for filename in glob.glob('./input_files/1mb_genome/*.fastq'):
+    for filename in glob.glob('./input_files/98mb_genome/*.fastq'):
         files.append(filename)
 
 
     #building Gk Array time and memory test
-    tracemalloc.start()
     gk_start = timer()
     gk_array = GkArray(files, 3)
-    gk_memory = tracemalloc.get_tracemalloc_memory()
+    gk_memory = asizeof.asizeof(gk_array)
     gk_end = timer()
-    tracemalloc.stop()
 
     #query time
     q_start = timer()
@@ -130,8 +128,8 @@ def test_100mb():
         if i == 0:
             print('-' * len(line))
 
-test_100kb()
-print ('\n\n')
+# test_100kb()
+# print ('\n\n')
 test_1mb()
 print ('\n\n')
 #test_100mb()

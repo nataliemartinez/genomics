@@ -30,48 +30,6 @@ def test_100kb():
     q_time = q_end - q_start
     h_stats.extend(((str(h_time) + " sec"), (str(h_memory / 1000) + " kb"), (str(q_time) + " sec")))
 
-
-    # #building FM Index time and memory test
-    # tracemalloc.start()
-    # fm_start = timer()
-    # fm_index = FmIndex(files)
-    # start_indices = fm_index.start_indices
-    # file_map = fm_index.file_map
-    # fm_memory = tracemalloc.get_tracemalloc_memory()
-    # fm_end = timer()
-    # tracemalloc.stop()
-
-    # #query time
-    # q_start = timer()
-    # occs = fm_index.occurrences("TTG")
-    # files = fm_index.report_files(occs, start_indices, file_map)
-    # q_end = timer()
-
-
-    # fm_time = fm_end - fm_start
-    # q_time = q_end - q_start
-    # fm_stats.extend(((str(fm_time) + " sec"), (str(fm_memory / 1000) + " kb"), (str(q_time) + " sec")))
-
-
-    # #building Gk Array time and memory test
-    # tracemalloc.start()
-    # gk_start = timer()
-    # gk_array = GkArray(files, 3)
-    # gk_memory = tracemalloc.get_tracemalloc_memory()
-    # gk_end = timer()
-    # tracemalloc.stop()
-
-    # #query time
-    # q_start = timer()
-    # gk_array.get_reads("TTG")
-    # q_end = timer()
-
-    # gk_time = gk_end - gk_start
-    # q_time = q_end - q_start
-    # gk_stats.extend(((str(gk_time) + " sec"), (str(gk_memory / 1000) + " kb"), (str(q_time) + " sec")))
-
-
-
     # Print performance stats
 
     titles = ['', 'Hash Table']
