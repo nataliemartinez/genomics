@@ -1,5 +1,6 @@
 from suffix_array import SuffixTree
 from errorChecks import list_occurrences
+from naive_suffix_array import suffix_array_ManberMyers
 
 class GkArray:
 
@@ -13,12 +14,14 @@ class GkArray:
         self.modified_SA = []
         self.file_specs = {} # file number : {file_name, read_length, entries, prev_reads}
         self.starts = [0] #indices of starting positions of files in Cr
-
-        #For Ukonnen suffix tree to work you have to append $ to end of Cr
         
+        
+        #For Ukonnen suffix tree to work you have to append $ to end of Cr
         self.concatenate_reads(files)
-        suffix_tree = SuffixTree(self.Cr + "$")
-        SA = suffix_tree.build_suffix_array()
+        SA = suffix_array_ManberMyers(self.Cr)
+        #suffix_tree = SuffixTree(self.Cr + "$")
+        #SA = suffix_tree.build_suffix_array()
+
         self.construct_GkSA(SA)
         self.construct_GkIFA_GkCFA()
         self.construct_GkCFPS()
@@ -60,7 +63,7 @@ class GkArray:
         g_index1 = self.g_inverse(index1)
         g_index2 = self.g_inverse(index2)
 
-        for i in range (self.k + 1):
+        for i in range (self.k):
             if self.Cr[g_index1 + i] != self.Cr[g_index2 + i]:
                 return False
         return True
@@ -84,6 +87,8 @@ class GkArray:
         GkCFA = [0] * len(self.GkSA)
         GkCFA[0] = 1
         t = 0
+
+
 
         for i in range(1, len(self.GkSA)):
             if not self.compare_kmer(i, i - 1):
@@ -175,6 +180,5 @@ class GkArray:
                     else:
                         return -1 # not found, not expected
                 l = c
-
 
 
