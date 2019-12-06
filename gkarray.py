@@ -151,7 +151,7 @@ class GkArray:
         result = {}
         cardinality = 0
         for i in l:
-            file_num = self.get_file(i)
+            file_num = self.get_file(self.g_inverse(i))
             m = self.file_specs[file_num]["read_length"]
             read_num = (self.g_inverse(i) - self.starts[file_num]) // m
             file_name = self.file_specs[file_num]["file"]
