@@ -1,17 +1,17 @@
 import sys
 import glob
-#import ctypes
+import ctypes
 from timeit import default_timer as timer
 from suffix_array import SuffixTree
-#from divsufsort import SuffixArray, divsufsort, divbwt
+from divsufsort import SuffixArray, divsufsort, divbwt
 
-# def CsuffixArray(s):
-#     """ C library version 10x fast """
-#     return divsufsort(s, (ctypes.c_int * len(s))())
+def CsuffixArray(s):
+    """ C library version 10x fast """
+    return divsufsort(s, (ctypes.c_int * len(s))())
 
-# def CbwtFromSa(t, sa=None):
-#     """ C library """
-#     return divbwt(t)
+def CbwtFromSa(t, sa=None):
+    """ C library """
+    return divbwt(t)
 
 def suffixArray(s):
     """ Our version """
@@ -143,7 +143,10 @@ class FmIndex():
 
     def suffixArray(self, s):
         """ Our version """
-        return SuffixTree(s + '$').build_suffix_array()
+        #return SuffixTree(s + '$').build_suffix_array()
+
+        """ C Library Suffix Array """
+        return divsufsort(s, (ctypes.c_int * len(s))())
 
     def bwtFromSa(self, t, sa=None):
         ''' Given T, returns BWT(T) by way of the suffix array. '''

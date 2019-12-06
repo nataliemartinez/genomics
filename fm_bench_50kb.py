@@ -18,8 +18,13 @@ def test_50kb():
     fm_index = FmIndex(files)
     start_indices = fm_index.start_indices
     file_map = fm_index.file_map
-    fm_memory = asizeof.asizeof(fm_index)
     fm_end = timer()
+
+    # comment this out of if script is taking too long and 
+    # set fm_memory  = 1 instead
+    # This will skip the memory measurement of the data strucutre
+    # but allow the test script to run faster
+    fm_memory = asizeof.asizeof(fm_index)
 
 
     #query time

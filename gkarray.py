@@ -1,6 +1,6 @@
 from suffix_array import SuffixTree
 from errorChecks import list_occurrences
-from naive_suffix_array import suffix_array_ManberMyers
+from naive_suffix_array import naive_suffix_array
 
 class GkArray:
 
@@ -17,7 +17,7 @@ class GkArray:
         
         #For Ukonnen suffix tree to work you have to append $ to end of Cr
         self.concatenate_reads(files)
-        #SA = suffix_array_ManberMyers(self.Cr)
+        #SA = naive_suffix_array(self.Cr)
         SA = SuffixTree(self.Cr + "$").build_suffix_array()
         #SA = suffix_tree.build_suffix_array()
 

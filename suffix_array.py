@@ -1,3 +1,14 @@
+# Suffix Array implementation that builds a Suffix Tree
+# using Ukonnen's Algorithm and then performs lexicographic
+# depth first traversal
+#
+#
+# Time Complexity: O(n)
+# 
+# Suffix Tree Library Source: https://github.com/kvh/Python-Suffix-Tree
+# Library was modified in order to build suffix array
+
+
 class Node(object):
     """A node in the suffix tree. 
     

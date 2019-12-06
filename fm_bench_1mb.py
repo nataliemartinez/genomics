@@ -18,9 +18,14 @@ def test_1mb():
     fm_index = FmIndex(files)
     start_indices = fm_index.start_indices
     file_map = fm_index.file_map
-    fm_memory = asizeof.asizeof(fm_index)
     fm_end = timer()
 
+
+    # comment this out of if script is taking too long and 
+    # set fm_memory  = 1 instead
+    # This will skip the memory measurement of the data strucutre
+    # but allow the test script to run faster
+    fm_memory = asizeof.asizeof(fm_index)
 
     #query time
     q_start = timer()
@@ -29,6 +34,7 @@ def test_1mb():
     q_end = timer()
 
 
+    print (occs)
     fm_time = fm_end - fm_start
     q_time = q_end - q_start
     fm_stats.extend(((str(fm_time) + " sec"), (str(fm_memory / 1000) + " kb"), (str(q_time) + " sec")))

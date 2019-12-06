@@ -16,9 +16,11 @@ def test_50kb():
     #building hash table time and memory test
     h_start = timer()
     h_table = hash_table(files)
-    h_memory = asizeof.asizeof(h_table)
     h_end = timer()
 
+
+    h_memory = asizeof.asizeof(h_table)
+    
     #query time
     q_start = timer()
     h_table.find_sequence("TTG")

@@ -2,6 +2,7 @@ import glob
 from timeit import default_timer as timer
 from pympler import asizeof
 from FMindex import FmIndex
+import tracemalloc
 
 def test_100mb():
     fm_stats = []
@@ -12,23 +13,31 @@ def test_100mb():
         files.append(filename)
 
 
-    #building Gk Array time and memory test
     # #building FM Index time and memory test
     fm_start = timer()
+    tracemalloc.start()
     fm_index = FmIndex(files)
-    #start_indices = fm_index.start_indices
-    #file_map = fm_index.file_map
-    fm_memory = asizeof.asizeof(fm_index)
+    h_memory = tracemalloc.get_tracemalloc_memory() 
+    tracemalloc.stop()
+    start_indices = fm_index.start_indices
+    file_map = fm_index.file_map
     fm_end = timer()
+
+    # comment this out of if script is taking too long and 
+    # set fm_memory  = 1 instead
+    # This will skip the memory measurement of the data strucutre
+    # but allow the test script to run faster
+    fm_memory = asizeof.asizeof(fm_index)
+
 
 
     #query time
     q_start = timer()
-    #occs = fm_index.occurrences("TTG")
-    #files = fm_index.report_files(occs, start_indices, file_map)
+    occs = fm_index.occurrences("TTG")
+    files = fm_index.report_files(occs, start_indices, file_map)
     q_end = timer()
 
-
+    print (h_memory)
     fm_time = fm_end - fm_start
     q_time = q_end - q_start
     fm_stats.extend(((str(fm_time) + " sec"), (str(fm_memory / 1000) + " kb"), (str(q_time) + " sec")))

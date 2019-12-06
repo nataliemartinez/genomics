@@ -18,9 +18,10 @@ def test_50kb():
 
     gk_start = timer()
     gk_array = GkArray(files, 3)
-    gk_memory = asizeof.asizeof(gk_array)
     gk_end = timer()
 
+
+    gk_memory = asizeof.asizeof(gk_array)
 
     #query time
     q_start = timer()

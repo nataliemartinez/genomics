@@ -16,8 +16,13 @@ def test_100mb():
     #building Gk Array time and memory test
     gk_start = timer()
     gk_array = GkArray(files, 3)
-    gk_memory = asizeof.asizeof(gk_array)
     gk_end = timer()
+
+    # comment this out of if script is taking too long and 
+    # set gk_memory  = 1 instead
+    # This will skip the memory measurement of the data strucutre
+    # but allow the test script to run faster
+    gk_memory = asizeof.asizeof(gk_array)
 
     #query time
     q_start = timer()
