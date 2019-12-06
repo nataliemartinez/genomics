@@ -207,15 +207,19 @@ class SuffixTree(object):
         return self.find_substring(substring) != -1
 
 
-    def dfs(self, node, nodes, path_length):
+    def dfs(self, node, nodes, prior_len):
         offset, children = nodes[node]
         if offset == -1:
-            self.sa.append(len(self.string) - path_length[node])
-        for c, child in sorted(children):
-            self.dfs(child, nodes, path_length)
+            self.sa.append(len(self.string) - prior_len[node])
+        for c, child, l in sorted(children):
+            if node != 0:
+                old_len = prior_len[node]
+                curr_len = prior_len[child]
+                prior_len[child] = curr_len + old_len
+            self.dfs(child, nodes, prior_len)
 
     def pre_process_suffix_tree(self, path_length, nodes):
-        re_visit = {}
+        prior_len = {}
         for edge in self.edges:
 
             #gets edge elements
@@ -224,43 +228,26 @@ class SuffixTree(object):
             dest_node = edge.dest_node_index
             suffix_link = self.nodes[dest_node].suffix_node
             first_index = edge.first_char_index
+            last_index = edge.last_char_index
 
-            #creates lookup table for path length from node to root
-            prior_len = path_length.get(source_node, 0)
-            if(prior_len == 0 and source_node != 0):
-                re_visit[dest_node] = source_node
-            length = prior_len + (edge.last_char_index - edge.first_char_index + 1)
-            path_length[dest_node] = length 
+            #track prior edge lengths
+            prior_len[dest_node] = last_index - first_index + 1
 
-            #creates dict of nodes and children
             if source_node not in nodes:
-                nodes[source_node] = (None, [(self.string[first_index], dest_node)])
+                nodes[source_node] = (None, [(self.string[first_index], dest_node, (last_index - first_index + 1))])
             else:
                 nbors = nodes[source_node][1]
-                nbors.append((self.string[first_index], dest_node))
+                nbors.append((self.string[first_index], dest_node, (last_index - first_index + 1)))
                 nodes[source_node] = (None, nbors)
             if suffix_link == -1:
                 nodes[dest_node] = (-1, [])
 
-        """loop to fix path_length for nodes that 
-           didn't have prior length on first iteration
-        """
-        while len(re_visit) > 0:
-
-            for node in list(re_visit):
-                prior_len = path_length.get(re_visit[node], 0)
-                if(re_visit[node] in re_visit and re_visit[node] != 0):
-                    continue
-                else:
-                    length = prior_len + path_length[node]
-                    path_length[node] = length
-                    re_visit.pop(node)
             
-        return path_length, nodes
+        return nodes, prior_len
         
     def build_suffix_array(self):
         path_length = {}
         nodes = {}
-        path_length, nodes = (self.pre_process_suffix_tree(path_length, nodes))
-        self.dfs(0,nodes, path_length)
+        nodes, prior_len = (self.pre_process_suffix_tree(path_length, nodes))
+        self.dfs(0,nodes, prior_len)
         return self.sa[1:]
