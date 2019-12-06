@@ -17,8 +17,8 @@ class GkArray:
         
         #For Ukonnen suffix tree to work you have to append $ to end of Cr
         self.concatenate_reads(files)
-        SA = suffix_array_ManberMyers(self.Cr)
-        #suffix_tree = SuffixTree(self.Cr + "$")
+        #SA = suffix_array_ManberMyers(self.Cr)
+        SA = SuffixTree(self.Cr + "$").build_suffix_array()
         #SA = suffix_tree.build_suffix_array()
 
         self.construct_GkSA(SA)

@@ -52,22 +52,5 @@ def list_occurrences(f, cr):
     
     return cr, entry
     
-"""
-Read all the fastqs in our directory and build map {seq: {file: [occ,...]}}
-"""
-def readFiles(): 
-    k_mer_counts = {} # map of {seq: {file: [occ,...]}}
-
-    file_counter = 0
-
-    for filename in glob.glob('*.fastq'):
-        # do stuff
-        list_occurrences(filename, k_mer_counts, "")
-
-    for k,v in k_mer_counts.items():
-        print(k,end=' ')
-        print(v)
-
 
 QUALITY_THRESHOLD = 1
-readFiles()

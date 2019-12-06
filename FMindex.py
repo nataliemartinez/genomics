@@ -1,17 +1,17 @@
 import sys
 import glob
-import ctypes
+#import ctypes
 from timeit import default_timer as timer
 from suffix_array import SuffixTree
-from divsufsort import SuffixArray, divsufsort, divbwt
+#from divsufsort import SuffixArray, divsufsort, divbwt
 
-def CsuffixArray(s):
-    """ C library version 10x fast """
-    return divsufsort(s, (ctypes.c_int * len(s))())
+# def CsuffixArray(s):
+#     """ C library version 10x fast """
+#     return divsufsort(s, (ctypes.c_int * len(s))())
 
-def CbwtFromSa(t, sa=None):
-    """ C library """
-    return divbwt(t)
+# def CbwtFromSa(t, sa=None):
+#     """ C library """
+#     return divbwt(t)
 
 def suffixArray(s):
     """ Our version """
@@ -270,31 +270,31 @@ class FmIndex():
         return ''.join(sequence)
 
     
-    def buildIndex(self, file_list):
-        """ This function grabs all input fastq files, returns FMIndex, start_indices, and file index """ 
-        concat_reads = []
-        start_indices = []
-        file_map = {}
-        start = 0
-        file_counter = 0
-        for filename in file_list:
-        # do stuff
-            seq = self.readFile(filename)
-            concat_reads.append(seq)
+    # def buildIndex(self, file_list):
+    #     """ This function grabs all input fastq files, returns FMIndex, start_indices, and file index """ 
+    #     concat_reads = []
+    #     start_indices = []
+    #     file_map = {}
+    #     start = 0
+    #     file_counter = 0
+    #     for filename in file_list:
+    #     # do stuff
+    #         seq = self.readFile(filename)
+    #         concat_reads.append(seq)
             
-            start_indices.append(start)
-            start += len(seq)
+    #         start_indices.append(start)
+    #         start += len(seq)
 
-            file_map[file_counter] = filename
-            file_counter += 1
+    #         file_map[file_counter] = filename
+    #         file_counter += 1
 
-        start_indices.append(start) # add end of file index
+    #     start_indices.append(start) # add end of file index
     
 
-        Cr = ''.join(concat_reads)
-        fm = FmIndex(Cr)
+    #     Cr = ''.join(concat_reads)
+    #     fm = FmIndex(Cr)
 
-        return fm, start_indices, file_map
+    #     return fm, start_indices, file_map
 
 # def benchmark():
 #     """ Rough benchmarking method """
