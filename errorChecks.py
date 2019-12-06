@@ -15,9 +15,8 @@ def k_mer_quality(kmer):
 List occurences of sequences in files
  fh = name of file 
  t = threshold for avg base quality 
- reads_dict = dictionary maping {read: {filename: [line occurrences in file]}}
 """
-def list_occurrences(f, reads_dict, cr):
+def list_occurrences(f, cr):
     min_qual = sys.maxsize
     first_pass = True #used for getting read length for file 
     read_length = 0
@@ -46,18 +45,12 @@ def list_occurrences(f, reads_dict, cr):
 
             # if avg quality > threshold add to dict {seq: {file: [occ,...]}}
             if min_qual >= QUALITY_THRESHOLD:  # quality threshold = 1; should this be inclusive or exclusive? 
-                file_occ_dict = reads_dict.get(seq, {})
-                file_occ = file_occ_dict.get(fh.name, []) 
-                file_occ.append(name)
-                file_occ_dict[fh.name] = file_occ
-                reads_dict[seq] = file_occ_dict
-
                 cr += seq
                 entries += 1
         
         entry = {"file" : f, "read_length" : read_length, "entries" : entries}
     
-    return reads_dict, cr, entry
+    return cr, entry
     
 """
 Read all the fastqs in our directory and build map {seq: {file: [occ,...]}}
