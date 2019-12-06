@@ -6,7 +6,6 @@ class GkArray:
 
     def __init__(self, files, k):
         self.k = k
-        self.valid_reads = {}
         self.GkSA = []
         self.GkIFA = None
         self.GkCFPS = None
@@ -30,7 +29,7 @@ class GkArray:
         file_counter = 0
         total_reads = 0
         for file in files:
-            self.valid_reads, self.Cr, entry = list_occurrences(file, self.valid_reads, self.Cr)
+            self.Cr, entry = list_occurrences(file, self.Cr)
             self.file_specs[file_counter] = entry
             self.file_specs[file_counter]["prev_read_count"] = total_reads
             self.starts.append(len(self.Cr))
