@@ -38,14 +38,33 @@ class GkArray:
             file_counter += 1
             total_reads += entry["entries"]
 
-    
-    #O(n), could be faster with modified binary search?
     # get the file number corresponding to a certain index for lookup in file_specs
-    def get_file(self, index):
-        for i in range(len(self.starts) - 1):
-            if index >= self.starts[i] and index < self.starts[i + 1]:
-                return i
-        return None
+    def get_file(self, x):
+        """ Find file from Cr index in O(logk) time """ 
+        l = 0
+        r = len(self.starts)
+        mid = (l + r)//2
+        prev = mid + 1
+        while l <= r: 
+    
+            mid = (l + r)//2 
+            
+            # return if x is in tight range
+            if self.starts[mid] <= x and x < self.starts[prev] and mid == prev - 1: 
+                return mid 
+    
+            # If x is greater, ignore left half 
+            elif self.starts[mid] < x: 
+                l = mid + 1
+                prev = mid + 1
+    
+            # If x is smaller, ignore right half 
+            else: 
+                r = mid - 1
+                prev = mid - 1
+        
+        # If we reach here, then the element at the edge
+        return mid
 
     # transform index of Cr to index for GkSA, modified for multiple files
     def g(self, index):
