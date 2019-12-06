@@ -15,7 +15,7 @@ Indexing large collections of reads can be incredibly costly in terms of time an
 
 
 ### Dependency Installation Instructions:
-Some imported libraries we used for this project were Pympler to measure the size of our data structures and an efficient C library to build suffix arrays. To download Pympler, a simple conda installation will suffice using `conda install pympler`. To download libdivsufsort, follow the instructions on their installation page: https://github.com/y-256/libdivsufsort. Its installation requires `cmake`.
+Some imported libraries we used for this project were Pympler to measure the size of our data structures and an efficient C library called libdivsufsort to build suffix arrays. To download Pympler, a simple conda installation will suffice using `conda install pympler`. To download libdivsufsort, follow the instructions on their installation page: https://github.com/y-256/libdivsufsort. Its installation requires `cmake`.
 
 
 ### Sources:
