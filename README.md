@@ -74,12 +74,24 @@ python3 gk_bench_50kb.py
 
 
 ### Sources:
-[1] Niko Välimäki and Veli Mäkinen. Space-efficient algorithms for document retrieval. In
-Annual Symposium on Combinatorial Pattern Matching, pages 205–215. Springer, 2007.
+[1] Olsen N, et. al: Challenging a bioinformatic tool's ability to detect microbial contaminants using in silico whole genome sequencing data. PeerJ 2017, 5: e3729.
 
-[2] Anthony J Cox, Markus J Bauer, Tobias Jakobi, and Giovanna Rosone. Large-scale compression of genomic sequence databases with the burrows–wheeler transform. Bioinformatics, 28(11):1415–1419, 2012.
+[2] Maróti Z, Boldogkői Z, Tombácz D et al: Evaluation of whole exome sequencing as an alternative to BeadChip and whole genome sequencing in human population genetic analysis. BMC Genomics (2018): 19(778)
 
-[3] Philippe Nicolas, Salson Mikaël, Lecroq Thierry, Léonard Martine, Commes Thérѐse, and Rivals Eric. Querying large read collections in main memory: a versatile data structure. BMC Bioinformatics, 12.
+[3] Dolle D, Liu Z, Cotten M, Simpson J, Iqbal Z, Durbin R, McCarthy S, Keane T: Using reference-free compressed data structures to analyse sequencing reads from thousands of human genomes. bioRxiv 2016, 060186.
 
-[4] Dirk-Dominic Dolle, Zhicheng Liu, Matthew L Cotten, Jared T Simpson, Zamin Iqbal, Richard Durbin, Shane McCarthy, and Thomas Keane. Using reference-free compressed data structures to analyse sequencing reads from thousands of human genomes. bioRxiv, page 060186, 2016.
+[4] Philippe N, Salson M, Lecroq T, et al:  Querying large read collections in main memory: a versatile data structure. BMC Bioinformatics 2011: 12(242).
+
+[5] Cox A, Bauer M, Jakobi T, Roson G: Large-scale compression of genomic sequence databases with the burrows–wheeler transform. Bioinformatics 2012, 28(11):1415–1419.
+
+[6]  Välimäki M, Mäkinen V: Space-efficient algorithms for document retrieval. In Annual Symposium on Combinatorial Pattern Matching 2007, 205-215.
+
+[7] Fulton B: Suffix Arrays. Algorithmic Alley 2013. 
+http://algorithmicalley.com/archive/2013/06/30/suffix-arrays.aspx
+
+[8] @benfulton 2019. SuffixArrays.
+https://github.com/benfulton/Algorithmic-Alley/tree/master/AlgorithmicAlley/SuffixArrays
+
+[9] @kvh 2017. Suffix Trees in Python.
+https://github.com/kvh/Python-Suffix-Tree.
 
