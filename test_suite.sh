@@ -7,6 +7,7 @@
 # improve script speed
 
 
+
 echo Hash Table Benchmarking results: '\n'
 python3 hash_bench_50kb.py
 echo '\n'
@@ -14,13 +15,13 @@ python3 hash_bench_1mb.py
 echo '\n'
 python3 hash_bench_100mb.py
 
-# echo '\n\n'
-# echo FM Index Benchmarking results: '\n'
-# python3 fm_bench_50kb.py
-# echo '\n'
-# python3 fm_bench_1mb.py
-# echo '\n'
-# python3 fm_bench_100mb.py
+echo '\n\n'
+echo FM Index Benchmarking results: '\n'
+python3 fm_bench_50kb.py
+echo '\n'
+python3 fm_bench_1mb.py
+echo '\n'
+python3 fm_bench_100mb.py
 
 
 echo '\n\n'

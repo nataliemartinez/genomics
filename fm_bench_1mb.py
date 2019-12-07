@@ -34,7 +34,6 @@ def test_1mb():
     q_end = timer()
 
 
-    print (occs)
     fm_time = fm_end - fm_start
     q_time = q_end - q_start
     fm_stats.extend(((str(fm_time) + " sec"), (str(fm_memory / 1000) + " kb"), (str(q_time) + " sec")))

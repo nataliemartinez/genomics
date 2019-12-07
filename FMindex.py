@@ -3,33 +3,12 @@ import glob
 import ctypes
 from timeit import default_timer as timer
 from suffix_array import SuffixTree
-from divsufsort import SuffixArray, divsufsort, divbwt
+from divsufsort import SuffixArray, divsufsort
 
-def CsuffixArray(s):
-    """ C library version 10x fast """
-    return divsufsort(s, (ctypes.c_int * len(s))())
-
-def CbwtFromSa(t, sa=None):
-    """ C library """
-    return divbwt(t)
 
 def suffixArray(s):
     """ Our version """
     return SuffixTree(s + '$').build_suffix_array()
-
-def bwtFromSa(t, sa=None):
-    ''' Given T, returns BWT(T) by way of the suffix array. '''
-    bw = []
-    dollarRow = None
-    if sa is None:
-        sa = suffixArray(t)
-    for si in sa:
-        if si == 0:
-            dollarRow = len(bw)
-            bw.append('$')
-        else:
-            bw.append(t[si-1])
-    return ''.join(bw), dollarRow # return string-ized version of list bw
 
 class FmCheckpoints(object):
     ''' Manages rank checkpoints and handles rank queries, which are
@@ -90,12 +69,6 @@ class FmIndex():
     
     def __init__(self, file_list, cpIval=4, ssaIval=4):
         
-        # concat_reads = []
-
-        # for filename in file_list:
-        # # do stuff
-        #     seq = self.readFile(filename)
-        #     self.concat_reads.append(seq)
 
         self.concat_reads = []
         self.start_indices = []
@@ -220,12 +193,6 @@ class FmIndex():
 
         return files
 
-    # def find_file(self, si, x): 
-    #     """ find file from Cr index in O(k) time """
-    #     for i in range(len(si) - 1):
-    #         if x >= si[i] and x < si[i + 1]:
-    #             return i
-    #     return -1
     
     def find_file_binSearch(self, arr, x):
         """ Find file from Cr index in O(logk) time """ 
@@ -271,46 +238,3 @@ class FmIndex():
                 sequence.append(seq)
         
         return ''.join(sequence)
-
-    
-    # def buildIndex(self, file_list):
-    #     """ This function grabs all input fastq files, returns FMIndex, start_indices, and file index """ 
-    #     concat_reads = []
-    #     start_indices = []
-    #     file_map = {}
-    #     start = 0
-    #     file_counter = 0
-    #     for filename in file_list:
-    #     # do stuff
-    #         seq = self.readFile(filename)
-    #         concat_reads.append(seq)
-            
-    #         start_indices.append(start)
-    #         start += len(seq)
-
-    #         file_map[file_counter] = filename
-    #         file_counter += 1
-
-    #     start_indices.append(start) # add end of file index
-    
-
-    #     Cr = ''.join(concat_reads)
-    #     fm = FmIndex(Cr)
-
-    #     return fm, start_indices, file_map
-
-# def benchmark():
-#     """ Rough benchmarking method """
-#     start = timer()
-#     # Needs to pass in $ to call method from it
-#     FM, start_indices, file_map = FmIndex('$').buildIndex(glob.glob('./input_files/1mb_genome/*.fastq'))
-#     end = timer()
-#     print(str(end - start) + " seconds to build index")
-
-#     start = timer()
-#     occs = FM.occurrences("ACCCC")
-#     files = FM.report_files(occs, start_indices, file_map)
-#     end = timer()
-#     print(str(end - start) + " seconds to report occurences")
-
-# benchmark()
